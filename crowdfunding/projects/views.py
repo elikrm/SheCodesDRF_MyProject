@@ -3,6 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import Http404
 from rest_framework.views import APIView
+from rest_framework.generics import DestroyAPIView
 from rest_framework.response import Response
 from .models import Project, Pledge
 from .serializers import ProjectSerializer, PledgeSerializer,ProjectDetailSerializer
@@ -58,6 +59,12 @@ class ProjectDetail(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
+    def delete(self, request, pk):
+        project = self.get_object(pk)
+        data = request.data
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PledgeList(APIView):
     def get(self, request):
