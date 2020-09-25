@@ -66,6 +66,33 @@ class ProjectDetail(APIView):
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# this class is showing the project progress
+class ProjectProgress(ProjectDetail):
+    def get_object(self, pk):
+        try:
+            project = Project.objects.get(pk=pk)
+            self.check_object_permissions(self.request, project)
+            return project
+
+        except Project.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        project = self.get_object(pk)
+        serializer = ProjectDetailSerializer(project)
+        # return Response(serializer.data)
+        progress_pledge = serializer.data
+        # return Response(progress_pledge["pledges"])
+        
+        print_progress = {}
+        print_progress["amount_progress"] = 0
+        for i in range(len(progress_pledge["pledges"])):
+            print_progress["amount_progress"] += progress_pledge["pledges"][i]["amount"]
+        return Response(print_progress)
+
+
+        
+
 class PledgeList(APIView):
     def get(self, request):
         pledges = Pledge.objects.all()
@@ -111,3 +138,5 @@ class PledgeDetailList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
+
