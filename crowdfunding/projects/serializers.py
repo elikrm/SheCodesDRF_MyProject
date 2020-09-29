@@ -39,8 +39,8 @@ class ProjectSerializer(serializers.Serializer):
     image = serializers.URLField()
     # is_open = serializers.BooleanField()
     is_open = serializers.SerializerMethodField()
-    date_created = serializers.DateTimeField(default=datetime.now())
-    date_end = serializers.DateTimeField(default = datetime.now() + timedelta(days = 30) )
+    date_created = serializers.DateTimeField(default=timezone.now())
+    date_end = serializers.DateTimeField(default = timezone.now() + timedelta(days = 30) )
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
@@ -49,7 +49,7 @@ class ProjectSerializer(serializers.Serializer):
         return Project.objects.create(**validated_data)
 
     def get_is_open(self, obj):
-            if datetime.now() > obj.date_end:
+            if timezone.now() > obj.date_end:
                 is_open = False
             else:
                 is_open = True

@@ -7,6 +7,7 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 
 from datetime import datetime, timedelta 
+from django.utils import timezone
 
 
 
@@ -17,8 +18,8 @@ class Project(models.Model):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField(default = True)
-    date_created = models.DateTimeField(default = datetime.now())
-    date_end = models.DateTimeField(default = datetime.now() + timedelta(days = 30))
+    date_created = models.DateTimeField(default = timezone.now())
+    date_end = models.DateTimeField(default = timezone.now() + timedelta(days = 30))
     # owner = models.CharField(max_length=200)
     owner = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name='owner_projects')
 
