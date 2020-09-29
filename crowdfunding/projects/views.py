@@ -67,7 +67,7 @@ class ProjectDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # this class is showing the project progress
-class ProjectProgress(ProjectDetail):
+class ProjectProgress(APIView):
     def get_object(self, pk):
         try:
             project = Project.objects.get(pk=pk)
@@ -89,9 +89,6 @@ class ProjectProgress(ProjectDetail):
         for i in range(len(progress_pledge["pledges"])):
             print_progress["amount_progress"] += progress_pledge["pledges"][i]["amount"]
         return Response(print_progress)
-
-
-        
 
 class PledgeList(APIView):
     def get(self, request):

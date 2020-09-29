@@ -6,6 +6,14 @@ from django.conf import settings
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 
+from datetime import datetime, timedelta 
+
+# Using current time 
+ini_time_for_now = datetime.now() 
+# Calculating future dates for 1 month
+future_date_after_30days = ini_time_for_now + timedelta(days = 30) 
+
+
 # Create your models here.
 class Project(models.Model):
     title = models.CharField(max_length=200)
@@ -13,7 +21,8 @@ class Project(models.Model):
     goal = models.IntegerField()
     image = models.URLField()
     is_open = models.BooleanField()
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(default = datetime.now)
+    date_end = models.DateTimeField(default = future_date_after_30days)
     # owner = models.CharField(max_length=200)
     owner = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name='owner_projects')
     slug = models.SlugField(blank=True, unique=True)

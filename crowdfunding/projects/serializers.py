@@ -1,5 +1,12 @@
 from rest_framework import serializers
 from .models import Project, Pledge
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+# Using current time 
+ini_time_for_now = datetime.now() 
+# Calculating future dates for 1 month
+future_date_after_30days = ini_time_for_now + timedelta(days = 30) 
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -31,14 +38,23 @@ class ProjectSerializer(serializers.Serializer):
     description = serializers.CharField(max_length=None)
     goal = serializers.IntegerField()
     image = serializers.URLField()
-    is_open = serializers.BooleanField()
-    date_created = serializers.DateTimeField()
+    # is_open = serializers.BooleanField()
+    is_open = serializers. SerializerMethodField()
+    date_created = serializers.DateTimeField(default=datetime.now)
+    date_end = serializers.DateTimeField(default = future_date_after_30days)
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
+
+    def get_is_open(self, obj):
+            if timezone.now() > obj.date_end:
+                is_open = False
+            else:
+                is_open = True
+            return is_open
 
 class ProjectDetailSerializer(ProjectSerializer):
     pledges = PledgeSerializer(many=True, read_only=True)
@@ -50,6 +66,7 @@ class ProjectDetailSerializer(ProjectSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.is_open = validated_data.get('is_open',instance.is_open)
         instance.date_created = validated_data.get('date_created',instance.date_created)
+        instance.date_end = validated_data.get('date_end', instance.date_end)
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         return instance
@@ -61,8 +78,15 @@ class ProjectDetailSerializer(ProjectSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.is_open = validated_data.get('is_open',instance.is_open)
         instance.date_created = validated_data.get('date_created',instance.date_created)
+        instance.date_end = validated_data.get('date_end', instance.date_end)
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         return instance
 
-    
+    # def get_is_open(self, obj):
+    #     project = self.get_object(pk=pk)
+    #     if datetime.now > obj.project.date_end:
+    #         is_open = False
+    #     else:
+    #         is_open = True
+    #     return is_open
