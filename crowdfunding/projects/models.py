@@ -8,10 +8,6 @@ from django.dispatch import receiver
 
 from datetime import datetime, timedelta 
 
-# Using current time 
-ini_time_for_now = datetime.now() 
-# Calculating future dates for 1 month
-future_date_after_30days = ini_time_for_now + timedelta(days = 30) 
 
 
 # Create your models here.
@@ -20,25 +16,24 @@ class Project(models.Model):
     description = models.TextField()
     goal = models.IntegerField()
     image = models.URLField()
-    is_open = models.BooleanField()
-    date_created = models.DateTimeField(default = datetime.now)
-    date_end = models.DateTimeField(default = future_date_after_30days)
+    is_open = models.BooleanField(default = True)
+    date_created = models.DateTimeField(default = datetime.now())
+    date_end = models.DateTimeField(default = datetime.now() + timedelta(days = 30))
     # owner = models.CharField(max_length=200)
     owner = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,related_name='owner_projects')
-    slug = models.SlugField(blank=True, unique=True)
 
     def __str__(self):
         return self.title
 
-@receiver(post_delete, sender=Project)
-def submission_delete(sender, instance, **kwargs):
-	instance.image.delete(False)
+# @receiver(post_delete, sender=Project)
+# def submission_delete(sender, instance, **kwargs):
+# 	instance.image.delete(False)
 
-def pre_save_blog_post_receiever(sender, instance, *args, **kwargs):
-	if not instance.slug:
-		instance.slug = slugify(instance.owner.username + "-" + instance.title)
+# def pre_save_blog_post_receiever(sender, instance, *args, **kwargs):
+# 	if not instance.slug:
+# 		instance.slug = slugify(instance.owner.username + "-" + instance.title)
 
-pre_save.connect(pre_save_blog_post_receiever, sender=Project)
+# pre_save.connect(pre_save_blog_post_receiever, sender=Project)
 
 class Pledge(models.Model):
     amount = models.IntegerField()
